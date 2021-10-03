@@ -195,8 +195,8 @@ public class ModsRepository extends JFrame implements ActionListener, LanguageEl
 	}
 
 	public void saveVersions() {
-		if (list.getSelectedValuesList().size() != 0) {
-			for (Object o : list.getSelectedValuesList()) {
+		if (list.getSelectedValues() != listModel.get(0)) {
+			for (Object o : list.getSelectedValues()) {
 				String s = (String) o;
 				new ReleaseJson(s).downloadJson();
 			}
@@ -206,8 +206,8 @@ public class ModsRepository extends JFrame implements ActionListener, LanguageEl
 				ex.printStackTrace();
 				Logger.printException(ex);
 			}
-			if (list.getSelectedValuesList().size() == 1) {
-				Launcher.currentInstance.version = (String) list.getSelectedValuesList().get(0);
+			if (listModel.get(1) == list.getSelectedValues()) {
+				Launcher.currentInstance.version = (String) listModel.get(1);
 				Launcher.setInstance(Launcher.currentInstance);
 				Launcher.currentInstance.saveInstance();
 			}
@@ -240,7 +240,7 @@ public class ModsRepository extends JFrame implements ActionListener, LanguageEl
 			saveVersions();
 			Window.modsRepo = null;
 		} else if (e.getSource() == more_button) {
-			for (Object l : list.getSelectedValuesList()) {
+			for (Object l : list.getSelectedValues()) {
 				String mod = (String) l;
 				new BrowserWindow(getInfo(mod));
 			}

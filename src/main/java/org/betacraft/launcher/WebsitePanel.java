@@ -137,7 +137,10 @@ public class WebsitePanel extends JPanel {
 						s.close();
 						instream.close();
 						textPane.setText(bob.toString());
-					} catch (SocketTimeoutException | UnknownHostException ex) {
+					} catch (SocketTimeoutException ex) {
+						textPane.setContentType("text/html");
+						textPane.setText("<html><body bgcolor=\"black\"><font color=\"red\"><br><br><br><br><br><center><h1>" + Lang.TAB_SRV_FAILED + "</h1><br>" + Lang.ERR_NO_CONNECTION + "</center></font></body></html>");
+					} catch (UnknownHostException ex) {
 						textPane.setContentType("text/html");
 						textPane.setText("<html><body bgcolor=\"black\"><font color=\"red\"><br><br><br><br><br><center><h1>" + Lang.TAB_SRV_FAILED + "</h1><br>" + Lang.ERR_NO_CONNECTION + "</center></font></body></html>");
 					} catch (Exception ex) {
@@ -195,9 +198,6 @@ public class WebsitePanel extends JPanel {
 						textPane.setText(bob.toString());
 						s.close();
 						con.disconnect();
-					} catch (SocketTimeoutException | UnknownHostException ex) {
-						textPane.setContentType("text/html");
-						textPane.setText("<html><body bgcolor=\"black\"><font color=\"red\"><br><br><br><br><br><center><h1>" + Lang.TAB_CL_FAILED + "</h1><br>" + Lang.ERR_NO_CONNECTION + "</center></font></body></html>");
 					} catch (Throwable ex) {
 						ex.printStackTrace();
 						Logger.printException(ex);

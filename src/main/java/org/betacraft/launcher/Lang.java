@@ -198,7 +198,6 @@ public class Lang extends JFrame implements LanguageElement {
 
 		OPTIONS_UPDATE_HEADER = Util.getProperty(file, "update_check", charset);
 		OPTIONS_PROXY = Util.getProperty(file, "use_betacraft", charset);
-		OPTIONS_RPC = Util.getProperty(file, "discord_rpc", charset);
 		OPTIONS_LAUNCH_ARGS = Util.getProperty(file, "launch_arguments", charset) + ":";
 		OPTIONS_KEEP_OPEN = Util.getProperty(file, "keep_launcher_open", charset);
 		OPTIONS_WIDTH = Util.getProperty(file, "width", charset);
@@ -305,7 +304,6 @@ public class Lang extends JFrame implements LanguageElement {
 	public static String OPTIONS_PROXY = "Use skin & sound proxy";
 	public static String OPTIONS_UPDATE_HEADER = "Update check";
 	public static String OPTIONS_KEEP_OPEN = "Keep the launcher open";
-	public static String OPTIONS_RPC = "Discord RPC";
 	public static String OPTIONS_LAUNCH_ARGS = "Launch arguments:";
 	public static String OPTIONS_OK = "OK";
 	public static String OPTIONS_WIDTH = "width:";

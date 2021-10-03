@@ -8,14 +8,12 @@ import java.util.ArrayList;
 
 import org.betacraft.launcher.Logger;
 
-import net.arikia.dev.drpc.DiscordRPC;
-
 public class PreClassicWrapper extends Wrapper {
 
 	public PreClassicWrapper(String user, String ver_prefix, String version, String sessionid, String mainFolder,
-			int height, int width, boolean RPC, String launchMethod, String server, String mppass, String USR,
+			int height, int width, String launchMethod, String server, String mppass, String USR,
 			String VER, Image img, ArrayList addons) {
-		super(user, ver_prefix, version, sessionid, mainFolder, height, width, RPC, launchMethod, server, mppass, null, USR, VER,
+		super(user, ver_prefix, version, sessionid, mainFolder, height, width, launchMethod, server, mppass, null, USR, VER,
 				img, addons);
 	}
 
@@ -69,10 +67,6 @@ public class PreClassicWrapper extends Wrapper {
 			};
 			t.start();
 			if (!this.addonsPostAppletInit(this.addons)) return;
-			while (t.getState() == State.RUNNABLE || t.getState() == State.NEW) {
-				if (discordThread != null) DiscordRPC.discordRunCallbacks();
-				Thread.sleep(2000);
-			}
 			this.stop();
 
 			return;

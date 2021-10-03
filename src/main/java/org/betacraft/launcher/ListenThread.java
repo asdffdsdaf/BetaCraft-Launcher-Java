@@ -61,7 +61,8 @@ public class ListenThread extends Thread {
 	}
 
 	public static boolean isAvailable() {
-		try (ServerSocket s = new ServerSocket(11799)) {
+		try {
+			ServerSocket s = new ServerSocket(11799);
 			s.close();
 			return true;
 		} catch (Throwable t) {

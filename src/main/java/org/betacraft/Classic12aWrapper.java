@@ -21,17 +21,15 @@ import org.betacraft.launcher.Lang;
 import org.betacraft.launcher.Logger;
 import org.betacraft.launcher.OS;
 
-import net.arikia.dev.drpc.DiscordRPC;
-
 // Pretends to be MinecraftApplet
 public class Classic12aWrapper extends Wrapper {
 	public Runnable run;
 	public Thread thread;
 
 	public Classic12aWrapper(String user, String ver_prefix, String version, String sessionid, String mainFolder,
-			Integer height, Integer width, Boolean RPC, String launchMethod, String server, String mppass, String USR,
+			Integer height, Integer width, String launchMethod, String server, String mppass, String USR,
 			String VER, Image img, ArrayList addons) {
-		super(user, ver_prefix, version, sessionid, mainFolder, height, width, RPC, launchMethod, server, mppass, null, USR, VER, img,
+		super(user, ver_prefix, version, sessionid, mainFolder, height, width, launchMethod, server, mppass, null, USR, VER, img,
 				addons);
 	}
 
@@ -72,8 +70,6 @@ public class Classic12aWrapper extends Wrapper {
 
 						gameFrame.validate();
 
-						// Start Discord RPC
-						if (discord) discordThread.start();
 					}
 
 					public void mouseEntered(MouseEvent arg0) {}
@@ -103,8 +99,6 @@ public class Classic12aWrapper extends Wrapper {
 
 				gameFrame.validate();
 
-				// Start Discord RPC
-				if (discord) discordThread.start();
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -141,8 +135,6 @@ public class Classic12aWrapper extends Wrapper {
 		if (!active) {
 			return;
 		}
-		// Shutdown the RPC correctly
-		if (discord) DiscordRPC.discordShutdown();
 		active = false;
 		try {
 			for (final Field mcField : mainClass.getDeclaredFields()) {

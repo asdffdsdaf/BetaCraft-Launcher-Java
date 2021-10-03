@@ -27,9 +27,9 @@ import org.betacraft.launcher.Logger;
 public class PreClassicWrapper2 extends Wrapper {
 
 	public PreClassicWrapper2(String user, String ver_prefix, String version, String sessionid, String mainFolder, int height,
-			int width, boolean RPC, String launchMethod, String server, String mppass, String USR, String VER,
+			int width, String launchMethod, String server, String mppass, String USR, String VER,
 			Image img, ArrayList addons) {
-		super(user, ver_prefix, version, sessionid, mainFolder, height, width, RPC, launchMethod, server, mppass, null, USR, VER,
+		super(user, ver_prefix, version, sessionid, mainFolder, height, width, launchMethod, server, mppass, null, USR, VER,
 				img, addons);
 	}
 
@@ -105,7 +105,7 @@ public class PreClassicWrapper2 extends Wrapper {
 			panel.add(infolabel1, BorderLayout.CENTER);
 			panel.setBackground(Color.BLACK);
 			panel.setPreferredSize(new Dimension(width, height));
-			Applet a = (Applet) mainClassInstance;
+			final Applet a = (Applet) mainClassInstance;
 
 			final ComponentAdapter listener = new ComponentAdapter() {
 				public void componentResized(ComponentEvent componentEvent) {
@@ -167,8 +167,6 @@ public class PreClassicWrapper2 extends Wrapper {
 			this.setLayout(new BorderLayout());
 			this.add(a, "Center");
 
-			// Start Discord RPC
-			if (discord) discordThread.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			Logger.printException(ex);

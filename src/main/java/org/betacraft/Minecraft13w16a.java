@@ -13,9 +13,9 @@ import org.betacraft.launcher.BC;
 public class Minecraft13w16a extends Wrapper {
 
 	public Minecraft13w16a(String user, String ver_prefix, String version, String sessionid, String mainFolder,
-			Integer height, Integer width, Boolean RPC, String launchMethod, String server, String mppass, String USR,
+			Integer height, Integer width, String launchMethod, String server, String mppass, String USR,
 			String VER, Image img, ArrayList addons) {
-		super(user, ver_prefix, version, sessionid, mainFolder, height, width, RPC, launchMethod, server, mppass, null, USR, VER, img,
+		super(user, ver_prefix, version, sessionid, mainFolder, height, width, launchMethod, server, mppass, null, USR, VER, img,
 				addons);
 	}
 
@@ -27,7 +27,7 @@ public class Minecraft13w16a extends Wrapper {
 
 	public void play() {
 		try {
-			ArrayList<String> params = new ArrayList<>();
+			ArrayList<String> params = new ArrayList();
 			params.add("java");
 			String nativesPath = BC.get() + "bin/natives";
 
@@ -44,7 +44,7 @@ public class Minecraft13w16a extends Wrapper {
 			});
 			StringBuilder bld = new StringBuilder();
 			for (File f : list) {
-				bld.append(f.toPath().toString() + ":");
+				bld.append(f.getPath() + ":");
 			}
 			bld.append(BC.get() + "versions/" + this.version + ".jar");
 			params.add(bld.toString());

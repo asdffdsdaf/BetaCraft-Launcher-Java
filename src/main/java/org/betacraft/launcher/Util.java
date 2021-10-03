@@ -1,35 +1,19 @@
 package org.betacraft.launcher;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URI;
-import java.nio.file.Files;
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import pl.betacraft.auth.Accounts;
-import pl.betacraft.auth.Authenticator;
-import pl.betacraft.auth.Credentials;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import pl.betacraft.auth.*;
 import pl.betacraft.auth.Credentials.AccountType;
-import pl.betacraft.auth.DownloadRequest;
-import pl.betacraft.auth.DownloadResponse;
-import pl.betacraft.auth.MicrosoftAuth;
-import pl.betacraft.auth.MojangAuth;
-import pl.betacraft.auth.NoAuth;
-import pl.betacraft.auth.RequestUtil;
 import pl.betacraft.json.lib.MouseFixMacOSJson;
+
+import java.io.*;
+import java.net.URI;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Util {
 	public static final Gson gson = new Gson();
@@ -44,7 +28,7 @@ public class Util {
 			Launcher.auth = new NoAuth("");
 			Accounts accs = new Accounts();
 			accs.current = Launcher.auth.getCredentials().local_uuid;
-			ArrayList<Credentials> list = new ArrayList<>();
+			ArrayList<Credentials> list = new ArrayList();
 			list.add(Launcher.auth.getCredentials());
 			accs.accounts = list;
 			Launcher.accounts = accs;
@@ -59,7 +43,7 @@ public class Util {
 			if (!accountsFile.exists()) {
 				accountsFile.createNewFile();
 			}
-			Files.write(accountsFile.toPath(), gsonPretty.toJson(Launcher.accounts).getBytes("UTF-8"));
+			IOUtils.write(gsonPretty.toJson(Launcher.accounts).getBytes("UTF-8"), new FileOutputStream(accountsFile.getPath()));
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -84,7 +68,7 @@ public class Util {
 			}
 			Accounts accs = null;
 			try {
-				accs = gson.fromJson(new String(Files.readAllBytes(accountsFile.toPath()), "UTF-8"), Accounts.class);
+				accs = gson.fromJson(new String(FileUtils.readFileToString(accountsFile)), Accounts.class);
 			} catch (Throwable t) {}
 
 			if (accs == null || accs.accounts == null) {
@@ -116,7 +100,7 @@ public class Util {
 			// Create new file, if it doesn't already exist
 			file.createNewFile();
 		} catch (IOException e) {
-			System.out.println(file.toPath().toString());
+			System.out.println(file.getPath());
 			e.printStackTrace();
 			Logger.printException(e);
 		}
@@ -225,10 +209,10 @@ public class Util {
 	}
 
 	public static Thread unzip(File source, File dest_folder, boolean delete) {
-		return unzip(source.toPath().toString(), dest_folder.toPath().toString(), delete);
+		return unzip(source.getPath(), dest_folder.getPath(), delete);
 	}
 
-	public static Thread unzip(String source, String dest_folder, boolean delete) {
+	public static Thread unzip(final String source, final String dest_folder, final boolean delete) {
 		Thread unrarthread = new Thread() {
 			public void run() {
 				FileInputStream fis;
@@ -279,7 +263,7 @@ public class Util {
 				Logger.a("Created a new file: " + file);
 			}
 		} catch (IOException e) {
-			System.out.println(file.toPath().toString());
+			System.out.println(file.getPath());
 			e.printStackTrace();
 			Logger.printException(e);
 		}
@@ -357,21 +341,21 @@ public class Util {
 
 		try {
 			if (local_javaagent_sha1 == null || !local_javaagent_sha1.equals(json.agent_sha1) || force) {
-				DownloadResponse agent_req = new DownloadRequest(json.agent_url, javaagent.toPath().toString(), json.agent_sha1, false).perform();
+				DownloadResponse agent_req = new DownloadRequest(json.agent_url, javaagent.getPath(), json.agent_sha1, false).perform();
 				if (agent_req.result != DownloadResult.OK) {
 					Logger.a("Failed to download macos javaagent");
 					return false;
 				}
 			}
 			if (local_lwjgl_sha1 == null || !local_lwjgl_sha1.equals(json.lwjgl_sha1) || force) {
-				DownloadResponse lwjgl_req = new DownloadRequest(json.lwjgl_url, lwjgl.toPath().toString(), json.lwjgl_sha1, false).perform();
+				DownloadResponse lwjgl_req = new DownloadRequest(json.lwjgl_url, lwjgl.getPath(), json.lwjgl_sha1, false).perform();
 				if (lwjgl_req.result != DownloadResult.OK) {
 					Logger.a("Failed to download macos-mousefix.zip");
 					return false;
 				}
 			}
 			if (local_javamod_sha1 == null || !local_javamod_sha1.equals(json.classes_sha1) || force) {
-				DownloadResponse classes_req = new DownloadRequest(json.classes_url, classes_temp_zip.toPath().toString(), json.classes_sha1, false).perform();
+				DownloadResponse classes_req = new DownloadRequest(json.classes_url, classes_temp_zip.getPath(), json.classes_sha1, false).perform();
 				if (classes_req.result != DownloadResult.OK) {
 					Logger.a("Failed to download macos-mousefix.zip");
 					return false;
@@ -391,20 +375,11 @@ public class Util {
 		}
 	}
 
-	public static boolean hasJFX() {
-		try {
-			javafx.scene.Parent.class.getName();
-			return true;
-		} catch (Throwable t) {
-			return false;
-		}
-	}
-
 	public static String getFullJavaVersion() {
 		String line = null;
 		try {
-			ArrayList<String> arl = new ArrayList<>();
-			arl.add(Launcher.javaRuntime.toPath().toString());
+			ArrayList<String> arl = new ArrayList();
+			arl.add(Launcher.javaRuntime.getPath());
 			arl.add("-version");
 			ProcessBuilder pb = new ProcessBuilder(arl);
 			Process p = pb.start();
@@ -412,7 +387,7 @@ public class Util {
 			BufferedReader br_log = new BufferedReader(isr_log);
 			while ((line = br_log.readLine()) != null) {
 				if (line.contains("version")) {
-					p.destroyForcibly();
+					p.destroy();
 					break;
 				}
 			}

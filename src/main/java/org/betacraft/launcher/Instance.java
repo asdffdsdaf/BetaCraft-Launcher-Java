@@ -1,11 +1,9 @@
 package org.betacraft.launcher;
 
+import org.apache.commons.io.IOUtils;
+
 import java.awt.Image;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,18 +18,16 @@ public class Instance {
 	public int height;
 	public boolean proxy;
 	public boolean keepopen;
-	public boolean RPC;
 	public List<String> addons;
 	public String gameDir;
 
-	private Instance(String name, String launchArgs, String version, int width, int height, boolean proxy, boolean keepopen, boolean RPC, List<String> addons, String gameDir) {
+	private Instance(String name, String launchArgs, String version, int width, int height, boolean proxy, boolean keepopen, List<String> addons, String gameDir) {
 		this.name = name;
 		this.launchArgs = launchArgs;
 		this.width = width;
 		this.height = height;
 		this.proxy = proxy;
 		this.keepopen = keepopen;
-		this.RPC = RPC;
 		this.addons = addons;
 		this.version = version;
 		this.gameDir = gameDir;
@@ -39,14 +35,14 @@ public class Instance {
 
 	public static Instance newInstance(String name) {
 		// Use default settings
-		return new Instance(name, "-Xmx512M", "b1.7.3", 854, 480, true, false, true, new ArrayList<String>(), BC.get() + name + "/");
+		return new Instance(name, "-Xmx512M", "b1.7.3", 854, 480, true, false, new ArrayList<String>(), BC.get() + name + "/");
 	}
 
 	public static Instance loadInstance(String name) {
 		try {
 			File instanceFile = new File(BC.get() + "launcher" + File.separator + "instances", name + ".txt");
 			if (!instanceFile.exists()) {
-				System.out.println(instanceFile.toPath().toString());
+				System.out.println(instanceFile.getPath());
 				Logger.printException(new Exception("Instance file is null!"));
 				return null;
 			}
@@ -77,7 +73,6 @@ public class Instance {
 
 				instance.proxy = Boolean.parseBoolean(Util.getProperty(instanceFile, "proxy"));
 				instance.keepopen = Boolean.parseBoolean(Util.getProperty(instanceFile, "keepopen"));
-				instance.RPC = Boolean.parseBoolean(Util.getProperty(instanceFile, "RPC"));
 			} catch (Throwable t) {
 				Logger.a("Instance '" + name + "' is corrupted!");
 				t.printStackTrace();
@@ -101,7 +96,6 @@ public class Instance {
 			Util.setProperty(instanceFile, "height", Integer.toString(this.height));
 			Util.setProperty(instanceFile, "proxy", Boolean.toString(this.proxy));
 			Util.setProperty(instanceFile, "keepopen", Boolean.toString(this.keepopen));
-			Util.setProperty(instanceFile, "RPC", Boolean.toString(this.RPC));
 			StringBuilder builder = new StringBuilder();
 			String addons = "";
 			if (this.addons.size() > 0) {
@@ -143,7 +137,6 @@ public class Instance {
 		cloned.keepopen = this.keepopen;
 		cloned.height = this.height;
 		cloned.width = this.width;
-		cloned.RPC = this.RPC;
 		cloned.addons = this.addons;
 		cloned.gameDir = this.gameDir;
 		cloned.version = this.version;
@@ -154,10 +147,10 @@ public class Instance {
 		File imgFile = new File(BC.get() + "launcher" + File.separator + "instances", this.name + ".png");
 		File defaultImg = new File(BC.get() + "launcher" + File.separator + "default_icon.png");
 		if (!imgFile.exists()) {
-			Files.copy(this.getClass().getClassLoader().getResourceAsStream("icons/favicon.png"), defaultImg.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			return defaultImg.toPath().toString();
+			IOUtils.copy(this.getClass().getClassLoader().getResourceAsStream("icons/favicon.png"), new FileOutputStream(defaultImg.getPath()));
+			return defaultImg.getPath();
 		}
-		return imgFile.toPath().toString();
+		return imgFile.getPath();
 	}
 
 	public Image getIcon() {
@@ -184,7 +177,7 @@ public class Instance {
 				imgFile.delete();
 				return;
 			}
-			Files.copy(path.toPath(), imgFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			IOUtils.copy(new FileInputStream(path.getPath()), new FileOutputStream(imgFile.getPath()));
 		} catch (IOException e2) {
 			e2.printStackTrace();
 			Logger.printException(e2);

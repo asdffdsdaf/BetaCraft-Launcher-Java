@@ -1,14 +1,13 @@
 package pl.betacraft.auth;
 
-import java.util.UUID;
-
 import org.betacraft.launcher.Lang;
 import org.betacraft.launcher.Launcher;
 import org.betacraft.launcher.Window;
-
 import pl.betacraft.auth.Credentials.AccountType;
 
-public class NoAuth implements Authenticator {
+import java.util.UUID;
+
+public class NoAuth extends Authenticator {
 	private Credentials credentials = new Credentials();
 
 	public NoAuth(Credentials c) {

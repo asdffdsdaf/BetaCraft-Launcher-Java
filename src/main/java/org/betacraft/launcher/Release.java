@@ -45,8 +45,8 @@ public class Release {
 			Scanner scanner = new Scanner(versionlisturl.openStream(), "UTF-8");
 			while (scanner.hasNextLine()) {
 				String[] versionNode = scanner.nextLine().split("`");
-				VersionInfo info = ReleaseJson.exists(versionNode[0]) ? new ReleaseJson(versionNode[0]) : new NofileVersionInfo(versionNode);
-				Release r = new Release(versionNode[0], info);
+				Object info = ReleaseJson.exists(versionNode[0]) ? new ReleaseJson(versionNode[0]) : new NofileVersionInfo(versionNode);
+				Release r = new Release(versionNode[0], (VersionInfo) info);
 				versions.add(r);
 			}
 			scanner.close();
@@ -60,7 +60,7 @@ public class Release {
 	}
 
 	public static ArrayList<VersionInfo> offlineVersionList() {
-		ArrayList<VersionInfo> list = new ArrayList<>();
+		ArrayList<VersionInfo> list = new ArrayList();
 		File versionsFolder = new File(BC.get() + "versions/");
 		File fakejsonsFolder = new File(versionsFolder, "jsons/");
 		// Get all representations of locally saved versions
@@ -106,7 +106,7 @@ public class Release {
 			}
 		}
 		// Remove extensions
-		ArrayList<String> stringlist = new ArrayList<>();
+		ArrayList<String> stringlist = new ArrayList();
 		for (int i = 0; i < offlinejars.length; i++) {
 			String jar = offlinejars[i];
 			if (jar == null) continue;
@@ -129,7 +129,7 @@ public class Release {
 	}
 
 	// Represents undownloaded versions
-	public static class NofileVersionInfo implements VersionInfo {
+	public static class NofileVersionInfo {
 		private String name;
 		private String othername = "";
 		private long compileTime = 0;
@@ -462,23 +462,31 @@ public class Release {
 
 	public interface VersionInfo {
 		public String getOtherName();
-		public String getVersion();
-		public Date getCompileDate();
-		public Date getReleaseDate();
-		public String getProxyArgs();
-		public String getLaunchMethod();
-		public String getLaunchMethodURL();
-		public String getDownloadURL();
-		public String getProtocol();
-		public String getEntry(String entry);
-		default void setEntry(String entry, String value) {};
-		public int getFileVersion();
-		default boolean isCustom() {
-			return false;
-		}
 
-		default void downloadJson() {
-			Launcher.download("http://files.betacraft.pl/launcher/assets/jsons/" + this.getVersion() + ".info", new File(BC.get() + "versions" + File.separator + "jsons", this.getVersion() + ".info"));
-		}
+		public String getVersion();
+
+		public Date getCompileDate();
+
+		public Date getReleaseDate();
+
+		public String getProxyArgs();
+
+		public String getLaunchMethod();
+
+		public String getLaunchMethodURL();
+
+		public String getDownloadURL();
+
+		public String getProtocol();
+
+		public String getEntry(String entry);
+
+		void setEntry(String entry, String value);
+
+		public int getFileVersion();
+
+		boolean isCustom();
+
+		void downloadJson();
 	}
 }

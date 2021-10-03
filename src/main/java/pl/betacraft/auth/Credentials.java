@@ -1,10 +1,11 @@
 package pl.betacraft.auth;
 
 import java.io.File;
-import java.nio.file.Files;
-
+import java.io.FileOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 public class Credentials {
 
@@ -19,7 +20,7 @@ public class Credentials {
 
 	public static Credentials[] load(File credentials) {
 		try {
-			String jsonContent = new String(Files.readAllBytes(credentials.toPath()), "UTF-8");
+			String jsonContent = new String(FileUtils.readFileToString(credentials));
 			return gson.fromJson(jsonContent, Credentials[].class);
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -29,7 +30,7 @@ public class Credentials {
 
 	public static boolean save(Credentials[] c, File cFile) {
 		try {
-			Files.write(cFile.toPath(), gsonPretty.toJson(c).getBytes("UTF-8"));
+			IOUtils.write(gsonPretty.toJson(c).getBytes("UTF-8"), new FileOutputStream(cFile.getPath()));
 			return true;
 		} catch (Throwable t) {
 			t.printStackTrace();

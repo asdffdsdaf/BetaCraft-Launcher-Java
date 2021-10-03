@@ -1,12 +1,7 @@
 package org.betacraft.launcher;
 
 import java.awt.Image;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -15,10 +10,6 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.UnknownHostException;
-import java.nio.file.FileSystemException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Scanner;
@@ -29,6 +20,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.betacraft.Classic12aWrapper;
 import org.betacraft.Classic15aWrapper;
 import org.betacraft.CommandLine;
@@ -57,7 +50,7 @@ public class Launcher {
 
 	public static Instance currentInstance;
 	public static boolean forceUpdate = false;
-	public static ArrayList<Thread> totalThreads = new ArrayList<>();
+	public static ArrayList<Thread> totalThreads = new ArrayList();
 	public static Authenticator auth;
 	public static Accounts accounts = new Accounts();
 
@@ -150,13 +143,13 @@ public class Launcher {
 
 				// Move the updated version to the destination
 				File dest = new File(pathToJar);
-				Files.copy(BC.currentPath.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				IOUtils.copy(new FileInputStream(BC.currentPath.getPath()), new FileOutputStream(dest.getPath()));
 
 				// Launch the updated launcher
 				ArrayList<String> pa = new ArrayList<String>();
 				pa.add("java");
 				pa.add("-jar");
-				pa.add(dest.toPath().toString());
+				pa.add(dest.getPath());
 				new ProcessBuilder(pa).start();
 
 				// Exit this process, its job is done
@@ -192,7 +185,7 @@ public class Launcher {
 			String meth = json.getLaunchMethod();
 
 			// Get addons as classes
-			ArrayList<Class<Addon>> addons = new ArrayList<>();
+			ArrayList<Class<Addon>> addons = new ArrayList();
 			if (!currentInstance.addons.isEmpty()) {
 				try {
 					System.err.println("Loading addons...");
@@ -208,7 +201,7 @@ public class Launcher {
 							loadClasses(path, loader);
 							Class<Addon> c = (Class<Addon>) loader.loadClass(s);
 							addons.add(c);
-							loader.close();
+							//loader.close();
 						} catch (Exception ex) {
 							System.err.println("An error occurred while loading an addon: " + s);
 							ex.printStackTrace();
@@ -240,25 +233,25 @@ public class Launcher {
 			Logger.a("Loaded in: " + (System.nanoTime() - nano) + " ns");
 			if (meth.equalsIgnoreCase("rd") || meth.equalsIgnoreCase("mc")) {
 				new Launcher().extractFromJar("/PreClassic.jar", new File(BC.get() + "launcher/", "PreClassic.jar"));
-				new PreClassicWrapper2(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+				new PreClassicWrapper2(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 			} else if (meth.equalsIgnoreCase("preclassic")) {
-				new PreClassicWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+				new PreClassicWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 			} else if (meth.equalsIgnoreCase("classic12a")) {
-				new Classic12aWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+				new Classic12aWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 			} else if (meth.equalsIgnoreCase("classic15a")) {
-				new Classic15aWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, uuid, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+				new Classic15aWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, meth, server, mppass, uuid, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 //			} else if (meth.equalsIgnoreCase("classic")) {
 //				new ClassicWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 //			} else if (meth.equalsIgnoreCase("classicmp")) {
 //				new ClassicMPWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 			} else if (meth.equalsIgnoreCase("indev") || meth.equalsIgnoreCase("classicmp") || meth.equalsIgnoreCase("classic")) {
-				new Wrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, uuid, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+				new Wrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, meth, server, mppass, uuid, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 			} else if (meth.equalsIgnoreCase("commandline")) {
-				new CommandLine(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+				new CommandLine(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 			} else if (meth.equalsIgnoreCase("1.6")) {
-				new Minecraft13w16a(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+				new Minecraft13w16a(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 			} else if (meth.equalsIgnoreCase("4k")) {
-				new FkWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+				new FkWrapper(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, meth, server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
 			} else {
 				try {
 					String path = BC.get() + "launcher" + File.separator + "launch-methods" + File.separator + meth + ".jar";
@@ -270,8 +263,8 @@ public class Launcher {
 					System.err.println("Launch method: " + meth);
 					Class c = loader.loadClass(meth);
 					Constructor con = c.getConstructor(String.class, String.class, String.class, String.class, String.class, Integer.class, Integer.class, Boolean.class, String.class, String.class, String.class, String.class, String.class, Image.class, ArrayList.class);
-					con.newInstance(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, currentInstance.RPC, json.getLaunchMethod(), server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
-					loader.close();
+					con.newInstance(username, currentInstance.name, currentInstance.version, sessionid, currentInstance.gameDir, currentInstance.height, currentInstance.width, json.getLaunchMethod(), server, mppass, Lang.WRAP_USER, Lang.WRAP_VERSION, currentInstance.getIcon(), addons);
+					// loader.close();
 				} catch (Exception ex) {
 					ex.printStackTrace();
 					Logger.printException(ex);
@@ -298,7 +291,7 @@ public class Launcher {
 		Logger.a("BetaCraft Launcher JE v" + VERSION + " loading...");
 		Logger.a("Java version: " + System.getProperty("java.vendor") + ", " + System.getProperty("java.runtime.name") + ", " + System.getProperty("java.runtime.version"));
 		Logger.a("Portable: " + BC.portable);
-		Logger.a("EXE: " + BC.currentPath.toPath().toString().endsWith(".exe"));
+		Logger.a("EXE: " + BC.currentPath.getPath().endsWith(".exe"));
 		Logger.a("Prerelease: " + BC.prerelease);
 		Logger.a("Nightly: " + BC.nightly);
 
@@ -335,8 +328,8 @@ public class Launcher {
 
 	public void extractFromJar(String filepath, File to) {
 		try {
-			Logger.a("Extracting \"" + filepath + "\" to \"" + to.toPath().toString() + "\"");
-			Files.copy(getClass().getResourceAsStream(filepath), Paths.get(to.toPath().toString()), StandardCopyOption.REPLACE_EXISTING);
+			Logger.a("Extracting \"" + filepath + "\" to \"" + to.getPath() + "\"");
+			IOUtils.copy(getClass().getResourceAsStream(filepath), new FileOutputStream(to.getPath()));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			Logger.printException(ex);
@@ -345,8 +338,8 @@ public class Launcher {
 
 	public void packToJar(String filepath, File to) {
 		try {
-			Logger.a("Extracting \"" + filepath + "\" to \"" + to.toPath().toString() + "\"");
-			Files.copy(getClass().getResourceAsStream(filepath), Paths.get(to.toPath().toString()), StandardCopyOption.REPLACE_EXISTING);
+			Logger.a("Extracting \"" + filepath + "\" to \"" + to.getPath() + "\"");
+			IOUtils.copy(getClass().getResourceAsStream(filepath), new FileOutputStream(to.getPath()));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			Logger.printException(ex);
@@ -383,9 +376,9 @@ public class Launcher {
 	public static void restart() {
 		try {
 			ArrayList<String> params = new ArrayList<String>();
-			params.add(new File(JAVA_HOME, "bin/java" + (OS.isWindows() ? ".exe" : "")).toPath().toString());
+			params.add(new File(JAVA_HOME, "bin/java" + (OS.isWindows() ? ".exe" : "")).getPath());
 			params.add("-jar");
-			params.add(BC.currentPath.toPath().toString());
+			params.add(BC.currentPath.getPath());
 			ProcessBuilder builder = new ProcessBuilder(params);
 			builder.start();
 		} catch (Exception ex) {
@@ -405,31 +398,14 @@ public class Launcher {
 		File wrapper = new File(BC.get() + "launcher", "betacraft_wrapper.jar");
 		if (BC.currentPath.length() != wrapper.length()) {
 			try {
-				Files.copy(BC.currentPath.toPath(), wrapper.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			} catch (FileSystemException ex) {
+				IOUtils.copy(new FileInputStream(BC.currentPath.getPath()), new FileOutputStream(wrapper.getPath()));
+			} catch (IOException ex) {
 				// There is another instance of the game running, we are going to ignore it
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				Logger.printException(ex);
 				JOptionPane.showMessageDialog(Window.mainWindow, "The file could not be copied! Try running with Administrator rights. If that won't help, contact: @Moresteck#1688", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
-			}
-		}
-
-		// Download Discord RPC if the checkbox is selected
-		if (Launcher.currentInstance.RPC) {
-			File rpc = new File(BC.get() + "launcher/", "discord_rpc.jar");
-			if (rpc.exists()) {
-				try {
-					String sha1 = Util.getSHA1(rpc);
-					String expected_hash = new CustomRequest("http://files.betacraft.pl/launcher/assets/discord_rpc.sha1").perform().response.replace("\n", "");
-					if (!sha1.equals(expected_hash)) {
-						Launcher.downloadWithButtonOutput("http://files.betacraft.pl/launcher/assets/discord_rpc.jar", rpc);
-					}
-				} catch (Throwable t) {}
-			}
-			if (!rpc.exists() || Launcher.forceUpdate) {
-				Launcher.downloadWithButtonOutput("http://files.betacraft.pl/launcher/assets/discord_rpc.jar", rpc);
 			}
 		}
 
@@ -487,7 +463,7 @@ public class Launcher {
 				}
 				ArrayList<String> params = new ArrayList<String>();
 
-				params.add(new File(JAVA_HOME, "bin/java" + (OS.isWindows() ? ".exe" : "")).toPath().toString());
+				params.add(new File(JAVA_HOME, "bin/java" + (OS.isWindows() ? ".exe" : "")).getPath());
 
 				// The colon in the launch arguments is different for Windows
 				String colon = ":";
@@ -498,14 +474,6 @@ public class Launcher {
 
 				if (OS.ARCH.contains("x86")) {
 					params.add("-Xss1M");
-				}
-
-				// Additional parameters:
-				// - Discord RPC
-				String add = "";
-				if (instance.RPC) {
-					// Add DRPC to the launch arguments
-					add = colon + BC.get() + "launcher" + File.separator + "discord_rpc.jar";
 				}
 
 				/*String lm = Release.getReleaseByName(instance.version).getJson().getLaunchMethod();
@@ -575,7 +543,7 @@ public class Launcher {
 				// Add the rest of params and launch the wrapper
 				//params.add("-Duser.home=" + instance.gameDir);
 				params.add("-cp");
-				params.add(BC.get() + "launcher" + File.separator + "betacraft_wrapper.jar" + add);
+				params.add(BC.get() + "launcher" + File.separator + "betacraft_wrapper.jar");
 				params.add("org.betacraft.launcher.Launcher");
 				params.add("wrap");
 				params.add(getNickname());
@@ -592,7 +560,6 @@ public class Launcher {
 				Logger.a(!token.equals("-") ? params.toString().replaceAll(token, "[censored sessionid]") : params.toString());
 
 				ProcessBuilder builder = new ProcessBuilder(params);
-				builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 				new File(instance.gameDir).mkdirs();
 				//builder.environment().put("APPDATA", instance.gameDir);
 				builder.directory(new File(instance.gameDir));
@@ -604,6 +571,7 @@ public class Launcher {
 
 				// For debugging
 				Process process = builder.start();
+				OutputStream stream = process.getOutputStream();
 				InputStream output = process.getInputStream(), err = process.getErrorStream();
 				InputStreamReader isr_log = new InputStreamReader(output), isr_err = new InputStreamReader(err);
 				BufferedReader br_log = new BufferedReader(isr_log), br_err = new BufferedReader(isr_err);
@@ -644,7 +612,7 @@ public class Launcher {
 					new File(currentFile.getPath(), s1).delete();
 				}
 				try {
-					Files.delete(currentFile.toPath());
+					FileUtils.forceDelete(currentFile);
 				} catch (Exception ex) {}
 			} else {
 				currentFile.delete();
@@ -804,16 +772,14 @@ public class Launcher {
 	}
 
 	public static DownloadResult downloadWithButtonOutput(String link, File folder) {
-		SwingUtilities.invokeLater(() -> {
-			Window.setStatus(Window.playButton, "Downloading: " + BC.trimBetaCraftDir(folder.toPath().toString()));
-		});
+		Window.setStatus(Window.playButton, "Downloading: " + BC.trimBetaCraftDir(folder.getPath()));
 		return download(link, folder);
 	}
 
 	public static DownloadResult download(String link, File folder) {
 		Logger.a("Download started from: " + link);
 
-		DownloadResponse response = new DownloadRequest(link, folder.toPath().toString(), null, true).perform();
+		DownloadResponse response = new DownloadRequest(link, folder.getPath(), null, true).perform();
 		return response.result;
 		//		// Get a backup file that we will use to restore the file if the upload fails
 		//		File backupfile = new File(BC.get() + "launcher" + File.separator + "backup.tmp");
@@ -887,7 +853,7 @@ public class Launcher {
 				// Display downloading dialogue
 				//DownloadFrame dl = new DownloadFrame(update_name);
 				String ending = ".jar";
-				if (BC.currentPath.toPath().toString().endsWith(".exe")) {
+				if (BC.currentPath.getPath().endsWith(".exe")) {
 					ending = ".exe";
 				}
 				if (BC.portable) {
@@ -901,7 +867,7 @@ public class Launcher {
 				download(url, new File(BC.get(), "betacraft.jar$tmp"));
 
 				// Launch the new version to finish updating
-				String[] args = new String[] {"java", "-jar", BC.get() + "betacraft.jar$tmp", "update", BC.currentPath.toPath().toString()};
+				String[] args = new String[] {"java", "-jar", BC.get() + "betacraft.jar$tmp", "update", BC.currentPath.getPath()};
 				Runtime.getRuntime().exec(args);
 
 				// Close this process

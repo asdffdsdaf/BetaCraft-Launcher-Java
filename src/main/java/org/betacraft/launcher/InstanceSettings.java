@@ -29,7 +29,6 @@ public class InstanceSettings extends JFrame implements LanguageElement {
 
 	public JCheckBox proxyCheck;
 	public JCheckBox keepOpenCheck;
-	public JCheckBox RPCCheck;
 	public JCheckBox forceUpdate = null;
 
 	public JLabel parametersText;
@@ -118,13 +117,6 @@ public class InstanceSettings extends JFrame implements LanguageElement {
 		panel.add(keepOpenCheck, constr);
 
 		constr.gridy++;
-		RPCCheck = new JCheckBox(Lang.OPTIONS_RPC);
-		RPCCheck.setForeground(Color.LIGHT_GRAY);
-		RPCCheck.setOpaque(false);
-		RPCCheck.setSelected(Launcher.currentInstance.RPC);
-		panel.add(RPCCheck, constr);
-
-		constr.gridy++;
 		parametersText = new JLabel(Lang.OPTIONS_LAUNCH_ARGS);
 		parametersText.setForeground(Color.LIGHT_GRAY);
 		panel.add(parametersText, constr);
@@ -158,7 +150,7 @@ public class InstanceSettings extends JFrame implements LanguageElement {
 							gameDir = dirChooser.getSelectedFile();
 						}
 					}
-					Launcher.currentInstance.gameDir = gameDir.toPath().toString();
+					Launcher.currentInstance.gameDir = gameDir.getPath();
 				}
 			}
 		});
@@ -372,7 +364,6 @@ public class InstanceSettings extends JFrame implements LanguageElement {
 		this.setTitle(Lang.OPTIONS_TITLE);
 		proxyCheck.setText(Lang.OPTIONS_PROXY);
 		keepOpenCheck.setText(Lang.OPTIONS_KEEP_OPEN);
-		RPCCheck.setText(Lang.OPTIONS_RPC);
 		parametersText.setText(Lang.OPTIONS_LAUNCH_ARGS);
 		dirChooser.setText(Lang.INSTANCE_GAME_DIRECTORY);
 		dimensions1Text.setText(Lang.OPTIONS_WIDTH);
@@ -391,7 +382,6 @@ public class InstanceSettings extends JFrame implements LanguageElement {
 	/*public void updateInfo() {
 		proxyCheck.setSelected(Launcher.currentInstance.proxy);
 		keepOpenCheck.setSelected(Launcher.currentInstance.keepopen);
-		RPCCheck.setSelected(Launcher.currentInstance.RPC);
 		parameters.setText(Launcher.currentInstance.launchArgs);
 		dimensions1.setText(Integer.toString(Launcher.currentInstance.width));
 		dimensions2.setText(Integer.toString(Launcher.currentInstance.height));
@@ -412,7 +402,6 @@ public class InstanceSettings extends JFrame implements LanguageElement {
 		}
 		Launcher.currentInstance.keepopen = keepOpenCheck.isSelected();
 		Launcher.currentInstance.proxy = proxyCheck.isSelected();
-		Launcher.currentInstance.RPC = RPCCheck.isSelected();
 		Launcher.currentInstance.launchArgs = parameters.getText();
 		if (!instanceName.getText().equals(Launcher.currentInstance.name) && !instanceName.getText().equals("")) {
 			Launcher.setInstance(Launcher.currentInstance.renameInstance(instanceName.getText()));

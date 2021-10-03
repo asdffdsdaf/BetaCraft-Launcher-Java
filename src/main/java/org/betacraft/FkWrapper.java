@@ -19,9 +19,9 @@ import org.betacraft.launcher.Logger;
 public class FkWrapper extends Wrapper {
 
 	public FkWrapper(String user, String ver_prefix, String version, String sessionid, String mainFolder, int height,
-			int width, boolean RPC, String launchMethod, String server, String mppass, String USR, String VER,
+			int width, String launchMethod, String server, String mppass, String USR, String VER,
 			Image img, ArrayList addons) {
-		super(user, ver_prefix, version, sessionid, mainFolder, height, width, RPC, launchMethod, server, mppass, null, USR, VER,
+		super(user, ver_prefix, version, sessionid, mainFolder, height, width, launchMethod, server, mppass, null, USR, VER,
 				img, addons);
 	}
 
@@ -107,9 +107,6 @@ public class FkWrapper extends Wrapper {
 			this.addHooks();
 
 			gameFrame.validate();
-
-			// Start Discord RPC
-			if (discord) discordThread.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			Logger.printException(ex);
